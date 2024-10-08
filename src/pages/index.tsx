@@ -66,7 +66,7 @@ export default function Home() {
           </a>
         </div>
         <button onClick={() => setCount(count + 1)}>Increment</button>
-        <h1 className="text-3xl sm:text-4xl text-center sm:text-left">
+        <h1 data-testid="count" className="text-3xl sm:text-4xl text-center sm:text-left">
           Your count is {count}
         </h1>
       </main>
