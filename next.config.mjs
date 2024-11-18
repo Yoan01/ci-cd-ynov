@@ -5,7 +5,9 @@ const nextConfig = {
   distDir: 'build',
   images: {
     unoptimized: true,
-  }
+  },
+  basePath: '/ci-cd-ynov',
+  assetPrefix: '/ci-cd-ynov/',
 };
 
 export default nextConfig;
