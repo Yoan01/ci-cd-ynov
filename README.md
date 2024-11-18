@@ -1,3 +1,6 @@
+# ** WARNING : Pour lancer le projet en local il faut commenter 2 lignes dans le fichier next config
+
+
 # **Formulaire d'inscription avec validation et gestion des erreurs**
 
 Ce projet est une application réalisée avec un framework JavaScript (React avec TypeScript) permettant à un utilisateur de s’enregistrer à travers un formulaire avec des règles de validation strictes et une gestion d’erreurs détaillée. Il est entièrement testé, documenté et déployé sur GitHub Pages avec un workflow CI/CD automatisé.
