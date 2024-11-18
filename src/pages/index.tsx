@@ -1,122 +1,230 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import { z } from "zod"
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {CalendarIcon} from "lucide-react";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Calendar} from "@/components/ui/calendar";
+import {cn} from "@/lib/utils";
+import {format} from "date-fns";
 import {useState} from "react";
+import {toast} from "sonner";
+import {Toaster} from "sonner";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+export const calculateAge = (birthdate: Date): number => {
+    const ageDifMs = Date.now() - birthdate.getTime();
+    const ageDate = new Date(ageDifMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+};
+
+export const formSchema = z.object({
+    firstname: z
+        .string()
+        .min(3, { message: "Le prénom doit comporter au moins 3 caractères." })
+        .max(20, { message: "Le prénom ne doit pas dépasser 20 caractères." })
+        .regex(/^[a-zA-ZÀ-ÿ-]+$/, { message: "Le prénom contient des caractères invalides." }),
+
+    lastname: z
+        .string()
+        .min(3, { message: "Le nom doit comporter au moins 3 caractères." })
+        .max(20, { message: "Le nom ne doit pas dépasser 20 caractères." })
+        .regex(/^[a-zA-ZÀ-ÿ-]+$/, { message: "Le nom contient des caractères invalides." }),
+
+    email: z.string().email({ message: "L'email n'est pas valide." }),
+
+    birthdate: z
+        .date()
+        .refine((date) => calculateAge(date) >= 18, { message: "Vous devez avoir au moins 18 ans." }),
+
+    city: z.string().min(1, { message: "La ville est obligatoire." }),
+
+    postalCode: z
+        .string()
+        .length(5, { message: "Le code postal doit comporter exactement 5 caractères." })
+        .regex(/^\d{5}$/, { message: "Le code postal doit être un nombre de 5 chiffres." }),
 });
 
 export default function Home() {
-  const [count, setCount] = useState(0)
+    const [registered, setRegistered] = useState(false)
+    const user: { firstname: string; lastname: string } =typeof window !== "undefined" && window.localStorage &&
+        JSON.parse(localStorage.getItem('user') ?? '{"firstname": "", "lastname": ""}');
+
+
+    const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      birthdate: new Date(),
+      city: "",
+      postalCode: "",
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+        toast.success('Inscription réussie !')
+      localStorage.setItem('user', JSON.stringify(values))
+      setRegistered(true)
+      form.reset()
+  }
+
+    function onError(errors: any) {
+        const errorMessages: string[] = [];
+
+        errorMessages.push("Veuillez corriger les erreurs suivantes :");
+
+        if (errors.firstname) {
+            errorMessages.push("Le prénom doit être entre 3 et 20 caractères.");
+        }
+        if (errors.lastname) {
+            errorMessages.push("Le nom doit être entre 3 et 20 caractères.");
+        }
+        if (errors.email) {
+            errorMessages.push("L'email n'est pas valide.");
+        }
+        if (errors.birthdate) {
+            errorMessages.push("La date de naissance doit être valide et ne peut pas être dans le futur.");
+        }
+        if (errors.city) {
+            errorMessages.push("La ville est obligatoire.");
+        }
+        if (errors.postalCode) {
+            errorMessages.push("Le code postal doit comporter exactement 5 chiffres.");
+        }
+
+        // Affiche un toast avec tous les messages d'erreur
+        if (errorMessages.length > 0) {
+            toast.error(errorMessages.join(" "));
+        }
+    }
   
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-            className="dark:invert"
-            src="https://nextjs.org/icons/next.svg"
-            alt="Next.js logo"
-            width={180}
-            height={38}
-            priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+      <>
+      <div className={'flex flex-col items-center justify-center h-screen gap-20'}>
+        <span>Inscrivez-vous !</span>
+          {registered ? (<div className={'flex flex-col gap-20'}><span>Bravo {user.firstname + ' ' +  user.lastname}, vous êtes inscrit ! 🎉</span><Button onClick={() =>setRegistered(false)}>Se réinscrire</Button></div>) : (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-8 ">
+            <div className={'flex gap-8'}>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-              className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-              href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-          >
-            <Image
-                className="dark:invert"
-                src="https://nextjs.org/icons/vercel.svg"
-                alt="Vercel logomark"
-                width={20}
-                height={20}
+          <FormField
+              control={form.control}
+              name="firstname"
+              render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prénom</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Prénom" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+              )}
+          />
+            <FormField
+                control={form.control}
+                name="lastname"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Nom</FormLabel>
+                        <FormControl>
+                        <Input placeholder="Nom" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
             />
-            Deploy now
-          </a>
-          <a
-              className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-              href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-        <button onClick={() => setCount(count + 1)}>Increment</button>
-        <h1 data-testid="count" className="text-3xl sm:text-4xl text-center sm:text-left">
-          Your count is {count}
-        </h1>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+
+            </div>
+            <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="birthdate"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                        <FormLabel>Date de naissance</FormLabel>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <FormControl>
+                                    <Button
+                                        className={cn(
+                                            "w-full pl-3",
+                                        )}
+                                    >
+                                        {field.value ? (
+                                            format(field.value, "PPP")
+                                        ) : (
+                                            <span>Choisissez une date</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="center">
+                                <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    initialFocus
+                                    captionLayout="dropdown-buttons"
+                                    fromYear={1960}
+                                    toYear={2030}
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <div className={'flex gap-8'}>
+
+            <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Ville</FormLabel>
+                        <FormControl>
+                        <Input placeholder="Ville" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="postalCode"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Code postal</FormLabel>
+                        <FormControl>
+                        <Input placeholder="Code postal" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            </div>
+
+          <Button type="submit" className={'w-full'}>S&#39;inscrire</Button>
+        </form>
+      </Form>)}
+      </div>
+    <Toaster /></>
+  )
 }

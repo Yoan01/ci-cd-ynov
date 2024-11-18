@@ -1,28 +1,41 @@
 {
   "name": "ci-cd-ynov",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://yoan01.github.io/ci-cd-ynov/",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest --coverage",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "publish": "npm publish --access public"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-scroll-area": "^1.2.1",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
     "lucide-react": "^0.460.0",
     "next": "14.2.14",
+    "next-themes": "^0.4.3",
     "react": "^18",
+    "react-day-picker": "^8.10.1",
     "react-dom": "^18",
+    "react-hook-form": "^7.53.2",
+    "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "@types/jest": "^29.5.13",
     "@types/node": "^20",
@@ -36,5 +49,19 @@
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yoan01/ci-cd-ynov.git"
+  },
+  "keywords": [
+    "ci",
+    "cd",
+    "devops",
+    "nextjs",
+    "github-pages"
+  ],
+  "author": "Ton Nom",
+  "license": "MIT",
+  "main": "dist/index.js"
 }
