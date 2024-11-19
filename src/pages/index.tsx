@@ -1,5 +1,5 @@
 import { z } from "zod"
-import {useForm} from "react-hook-form";
+import {FieldErrors, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Button} from "@/components/ui/button";
@@ -71,7 +71,7 @@ export default function Home() {
       form.reset()
   }
 
-    function onError(errors: any) {
+    function onError(errors: FieldErrors<z.infer<typeof formSchema>>) {
         const errorMessages: string[] = [];
 
         errorMessages.push("Veuillez corriger les erreurs suivantes :");

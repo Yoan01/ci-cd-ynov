@@ -6,8 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: '/ci-cd-ynov', // à retirer quand on dev en local
-  assetPrefix: '/ci-cd-ynov/', // à retirer quand on dev en local
+  basePath: '/ci-cd-ynov', // à retirer quand on dev en local permet d'avoir le css dans le deploiement
+  assetPrefix: '/ci-cd-ynov/', // à retirer quand on dev en local permet d'avoir le css dans le deploiement
 };
 
 export default nextConfig;
