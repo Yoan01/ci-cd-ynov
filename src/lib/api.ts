@@ -1,9 +1,9 @@
 import {z} from "zod";
-import {formSchema} from "@/components/RegistrationForm";
+import {registerFormSchema} from "@/components/RegistrationForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
-export async function registerUser(userData: z.infer<typeof formSchema>) {
+export async function registerUser(userData: z.infer<typeof registerFormSchema>) {
   const response = await fetch(`${API_URL}/users`, {
     method: "POST",
     headers: {
