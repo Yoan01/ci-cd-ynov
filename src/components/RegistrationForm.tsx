@@ -1,41 +1,82 @@
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import {calculateAge, cn} from "@/lib/utils"
-import {toast} from "sonner";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {format} from "date-fns";
-import {CalendarIcon} from "lucide-react";
-import {Calendar} from "@/components/ui/calendar";
-import {registerUser} from "@/lib/api";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { calculateAge, cn } from "@/lib/utils";
+import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { loginUser, registerUser } from "@/lib/api";
 import Link from "next/link";
+import { router } from "next/client";
+import { useRouter } from "next/router";
 
-export const registerFormSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, "Le prénom est requis")
-    .regex(/^[a-zA-ZÀ-ÿ\s-]+$/, "Le prénom ne doit contenir que des lettres, espaces, et tirets"),
-  lastName: z
-    .string()
-    .min(1, "Le nom est requis")
-    .regex(/^[a-zA-ZÀ-ÿ\s-]+$/, "Le nom ne doit contenir que des lettres, espaces, et tirets"),
-  email: z.string().email("L'email n'est pas valide"),
-  birthDate: z
-    .date()
-    .refine((date) => calculateAge(date) >= 18, { message: "Vous devez avoir au moins 18 ans." }),
-  city: z
-    .string()
-    .min(1, "La ville est requise")
-    .regex(/^[a-zA-ZÀ-ÿ\s-]+$/, "La ville ne doit contenir que des lettres, espaces, et tirets"),
-  postalCode: z.string().regex(/^\d{5}$/, "Le code postal doit être au format français (5 chiffres)"),
-})
+export const registerFormSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(1, "Le prénom est requis")
+      .regex(
+        /^[a-zA-ZÀ-ÿ\s-]+$/,
+        "Le prénom ne doit contenir que des lettres, espaces, et tirets",
+      ),
+    lastName: z
+      .string()
+      .min(1, "Le nom est requis")
+      .regex(
+        /^[a-zA-ZÀ-ÿ\s-]+$/,
+        "Le nom ne doit contenir que des lettres, espaces, et tirets",
+      ),
+    email: z.string().email("L'email n'est pas valide"),
+    birthDate: z
+      .date()
+      .refine((date) => calculateAge(date) >= 18, {
+        message: "Vous devez avoir au moins 18 ans.",
+      }),
+    city: z
+      .string()
+      .min(1, "La ville est requise")
+      .regex(
+        /^[a-zA-ZÀ-ÿ\s-]+$/,
+        "La ville ne doit contenir que des lettres, espaces, et tirets",
+      ),
+    postalCode: z
+      .string()
+      .regex(
+        /^\d{5}$/,
+        "Le code postal doit être au format français (5 chiffres)",
+      ),
+    password: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    confirmPassword: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });
 
 export default function RegistrationForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof registerFormSchema>>({
     resolver: zodResolver(registerFormSchema),
@@ -46,23 +87,43 @@ export default function RegistrationForm() {
       birthDate: undefined,
       city: "",
       postalCode: "",
+      password: "",
+      confirmPassword: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof registerFormSchema>) {
-    setIsSubmitting(true)
-    await registerUser(values)
+    setIsSubmitting(true);
+    await registerUser({
+      email: values.email,
+      password: values.password,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      birthDate: values.birthDate,
+      city: values.city,
+      postalCode: values.postalCode,
+    })
       .then(() => {
-        toast.success('Inscription réussie !', {description: 'Vos informations ont été enregistrées avec succès.'})
-        form.reset()
+        toast.success("Inscription réussie !", {
+          description: "Vos informations ont été enregistrées avec succès.",
+        });
+        router.push("/users");
+        form.reset();
       })
-      .catch(() => toast.error('Erreur', {description: 'Une erreur est survenue lors de l\'inscription.'}))
-    setIsSubmitting(false)
+      .catch((error) =>
+        toast.error("Erreur", {
+          description:
+            "Une erreur est survenue lors de l'inscription : " + error,
+        }),
+      );
+    setIsSubmitting(false);
   }
 
   return (
     <div className="text-white flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-semibold mb-8 text-center">Inscrivez-vous !</h1>
+      <h1 className="text-2xl font-semibold mb-8 text-center">
+        Inscrivez-vous !
+      </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
@@ -127,11 +188,7 @@ export default function RegistrationForm() {
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
-                      <Button
-                        className={cn(
-                          "w-full pl-3",
-                        )}
-                      >
+                      <Button className={cn("w-full pl-3")}>
                         {field.value ? (
                           format(field.value, "PPP")
                         ) : (
@@ -192,10 +249,48 @@ export default function RegistrationForm() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">Mot de passe</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Mot de passe"
+                      {...field}
+                      className="bg-black border-gray-700 text-white placeholder:text-gray-500"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">
+                    Confirmer le mot de passe
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Confirmer le mot de passe"
+                      {...field}
+                      className="bg-black border-gray-700 text-white placeholder:text-gray-500"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <Button
             type="submit"
-            disabled={isSubmitting || !form.formState.isValid}
+            disabled={isSubmitting}
             className="w-full bg-zinc-900 hover:bg-zinc-800 text-white"
           >
             S&#39;inscrire
@@ -206,6 +301,5 @@ export default function RegistrationForm() {
         Vous avez déjà un compte ? Connectez-vous
       </Link>
     </div>
-  )
+  );
 }
-

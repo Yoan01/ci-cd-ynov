@@ -1,10 +1,10 @@
 // les tests ne passent pas
 //random test to pass
-describe('RegistrationForm', () => {
-  it('renders form fields correctly', () => {
+describe("RegistrationForm", () => {
+  it("renders form fields correctly", () => {
     expect(true).toBe(true);
   });
-})
+});
 
 // import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // import { registerUser } from '@/lib/api';
