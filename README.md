@@ -90,12 +90,43 @@ Tous les composants et fonctions critiques sont testés. Les tests couvrent les 
 
 ## **Pipeline CI/CD**
 
-1. **GitHub Actions** :
+1. **CI** :
 
-   - Prebuild : Tests
+   - **prebuild** : Les tests doivent réussir avant tout déploiement.
 
-2. **Déploiement :**
-   - **GitHub Pages** : Le projet est automatiquement déployé après validation.
-   - **npm** : Les tests doivent réussir avant tout déploiement.
+2. **CD:**
+   - **build** : Si les tests fonctionnent correctement, le projet est build.
+
+---
+
+## **Lancer le projet en local**
+
+1. **Cloner le projet :**
+
+   ```bash
+   git clone https://github.com/Yoan01/CI-CD-ynov-backend.git
+    ```
+2. **Installer les dépendances :**
+
+    ```bash
+    npm install
+    ```
+   
+3. **Ajouter un fichier `.env` à la racine du projet :**'
+
+    ```bash
+    NEXT_PUBLIC_API_URL=https://ci-cd-ynov-backend.vercel.app/api
+    NEXT_PUBLIC_APP_URL=http://localhost:3000/
+    NEXT_PUBLIC_APP_NAME=CICD
+    NEXT_PUBLIC_ENV=dev
+    ```
+    L'url de l'API est celle du backend déployé sur Vercel. Vous pouvez aussi lancer le backend en local et changer l'url de l'API.
+
+
+4. **Lancer le projet :**
+
+    ```bash
+    npm run dev
+    ```
 
 ---
