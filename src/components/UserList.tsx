@@ -24,7 +24,7 @@ import {
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import {deleteUser, getUsers} from "@/lib/api";
+import { deleteUser, getUsers } from "@/lib/api";
 import { useRouter } from "next/router";
 
 type User = {
@@ -72,9 +72,10 @@ export default function UserList() {
   const handleDeleteUser = (userId: string) => {
     setUsers(users.filter((user) => user._id !== userId));
     deleteUser(userId).then(() => {
-    toast.success("Utilisateur supprimé", {
-      description: "L'utilisateur a été supprimé avec succès.",
-    })});
+      toast.success("Utilisateur supprimé", {
+        description: "L'utilisateur a été supprimé avec succès.",
+      });
+    });
   };
 
   return (
@@ -151,11 +152,14 @@ export default function UserList() {
           </TableBody>
         </Table>
       </div>
-      <Button className={'mt-10'} onClick={() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        router.push("/login");
-      }}>
+      <Button
+        className={"mt-10"}
+        onClick={() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push("/login");
+        }}
+      >
         Se déconnecter
       </Button>
     </div>

@@ -22,9 +22,8 @@ import {
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { loginUser, registerUser } from "@/lib/api";
+import { registerUser } from "@/lib/api";
 import Link from "next/link";
-import { router } from "next/client";
 import { useRouter } from "next/router";
 
 export const registerFormSchema = z
@@ -44,11 +43,9 @@ export const registerFormSchema = z
         "Le nom ne doit contenir que des lettres, espaces, et tirets",
       ),
     email: z.string().email("L'email n'est pas valide"),
-    birthDate: z
-      .date()
-      .refine((date) => calculateAge(date) >= 18, {
-        message: "Vous devez avoir au moins 18 ans.",
-      }),
+    birthDate: z.date().refine((date) => calculateAge(date) >= 18, {
+      message: "Vous devez avoir au moins 18 ans.",
+    }),
     city: z
       .string()
       .min(1, "La ville est requise")
