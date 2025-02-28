@@ -1,14 +1,12 @@
-# \*\* WARNING : Pour lancer le projet en local il faut commenter 2 lignes dans le fichier next config
-
 # **Formulaire d'inscription avec validation et gestion des erreurs**
 
-Ce projet est une application réalisée avec un framework JavaScript (React avec TypeScript) permettant à un utilisateur de s’enregistrer à travers un formulaire avec des règles de validation strictes et une gestion d’erreurs détaillée. Il est entièrement testé, documenté et déployé sur GitHub Pages avec un workflow CI/CD automatisé.
+Ce projet est une application réalisée avec Nextjs (React avec TypeScript) permettant à un utilisateur de s’enregistrer à travers un formulaire avec des règles de validation strictes et une gestion d’erreurs détaillée. Il est testé, documenté et déployé.
 
 ---
 
 ## **Fonctionnalités principales**
 
-1. **Formulaire d'inscription utilisateur :**
+1. **Formulaire d'inscription utilisateur / liste d'utilisateurs / login / delete :**
 
    - Champs requis :
      - **Nom** : Validation pour interdire les caractères spéciaux et les chiffres (accents, trémas, et tirets acceptés).
@@ -17,12 +15,15 @@ Ce projet est une application réalisée avec un framework JavaScript (React ave
      - **Date de naissance** : L'utilisateur doit avoir au moins **18 ans**.
      - **Ville** : Champ texte classique.
      - **Code postal** : Doit respecter le format français (5 chiffres).
-   - Le bouton **"Sauvegarder"** est désactivé tant que tous les champs ne sont pas remplis correctement.
+     - **Password** : Champ texte classique (8 caractères minimum).
+   - Le bouton **"Sauvegarder"** est désactivé tant que tous les champs ne sont pas remplis correctement, on peut cliquer dessus pour voir l'erreur des inputs.
+
 
 2. **Validation des données :**
 
    - Les champs sont validés dynamiquement.
    - Affichage des messages d'erreur sous chaque champ non valide, en rouge.
+
 
 3. **Sauvegarde des données :**
    - Si les champs sont valides :
@@ -53,6 +54,8 @@ Ce projet est une application réalisée avec un framework JavaScript (React ave
 4. **Code postal :**
    - Doit comporter **exactement 5 chiffres** pour respecter le format français.
 
+5. **Password :**
+   - Doit contenir **au moins 8 caractères**.
 ---
 
 ## **Tests et couverture**
@@ -82,7 +85,6 @@ Tous les composants et fonctions critiques sont testés. Les tests couvrent les 
 ### **Couverture attendue**
 
 - Couverture totale à **100 %** pour tous les fichiers critiques (hors `index.tsx` et `reportWebVitals.ts`).
-- Rapport généré avec **Codecov** et intégré dans le pipeline CI/CD.
 
 ---
 
@@ -90,11 +92,7 @@ Tous les composants et fonctions critiques sont testés. Les tests couvrent les 
 
 1. **GitHub Actions** :
 
-   - Workflow automatisé exécutant :
-     - Tests unitaires (UT).
-     - Tests d'intégration (IT).
-     - Rapport de couverture.
-   - Déploiement conditionné au succès des tests.
+   - Prebuild : Tests
 
 2. **Déploiement :**
    - **GitHub Pages** : Le projet est automatiquement déployé après validation.
